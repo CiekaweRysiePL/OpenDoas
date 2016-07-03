@@ -43,6 +43,10 @@ clean:
 	rm -f ${OBJS:.o=.d}
 	rm -f ${PROG}
 
+test:
+	# no tests yet, make travis happy
+	true
+
 -include ${OBJS:.o=.d} ${OPENBSD:.o=.d}
 
 .PHONY: default clean install uninstall
