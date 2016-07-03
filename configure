@@ -115,15 +115,13 @@ esac
 	printf 'CFLAGS   +=	-static\n' >>$CONFIG_MK
 
 # Add CPPFLAGS/CFLAGS/LDFLAGS to CC for testing features
-XCC="${CC:=clang} $CFLAGS $OS_CFLAGS $CPPFLAGS $LDFLAGS"
-# Make sure to disable --as-needed for CC tests.
-XCC="$XCC -Wl,--no-as-needed"
+XCC="${CC:=cc} $CFLAGS $OS_CFLAGS $CPPFLAGS $LDFLAGS"
 
 check_func() {
 	func="$1"; src="$2"; shift 2
 	printf 'Checking for %-14s\t\t' "$func ..."
 	printf '%s\n' "$src" >"_$func.c"
-	$XCC "_$func.c" -o "_$func" 2>/dev/null
+	$XCC "_$func.c" -o "_$func" #2>/dev/null
 	ret=$?
 	rm -f "_$func.c" "_$func"
 	if [ $ret -eq 0 ]; then
