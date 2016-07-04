@@ -438,13 +438,27 @@ main(int argc, char **argv)
 	    LOGIN_SETUSER) != 0)
 		errx(1, "failed to set user context for target");
 #else
+
+#ifdef HAVE_SETRESGID
 	if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) != 0)
 		errx(1, "setresgid");
+#else /* HAVE_SETRESGID */
+	if (setreuid(pw->pw_uid, pw->pw_uid) < 0)
+		errx(1, "setreuid");
+#endif /* HAVE_SETRESUID */
+
 	if (initgroups(pw->pw_name, pw->pw_gid) != 0)
 		errx(1, "initgroups");
+
+#ifdef HAVE_SETRESUID
 	if (setresuid(target, target, target) != 0)
 		errx(1, "setresuid");
-#endif
+#else /* HAVE_SETRESUID */
+	if (setreuid(pw->pw_uid, pw->pw_uid) < 0)
+		errx(1, "setreuid");
+#endif /* HAVE_SETRESUID */
+
+#endif /* HAVE_BSD_AUTH_H */
 
 	if (pledge("stdio rpath exec", NULL) == -1)
 		err(1, "pledge");

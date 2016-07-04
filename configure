@@ -121,7 +121,7 @@ check_func() {
 	func="$1"; src="$2"; shift 2
 	printf 'Checking for %-14s\t\t' "$func ..."
 	printf '%s\n' "$src" >"_$func.c"
-	$XCC "_$func.c" -o "_$func" #2>/dev/null
+	$XCC "_$func.c" -o "_$func" 2>/dev/null
 	ret=$?
 	rm -f "_$func.c" "_$func"
 	if [ $ret -eq 0 ]; then
@@ -195,7 +195,7 @@ check_func "errc" "$src" || {
 src='
 #include <err.h>
 int main(void) {
-	verrc(0, 0, "");
+	verrc(0, 0, "%d", 1);
 	return 0;
 }'
 check_func "verrc" "$src" || {
@@ -301,7 +301,7 @@ check_func "shadow_h" "$src" && {
 src='
 #include <unistd.h>
 int main(void) {
-	const char *p = { "", NULL };
+	char *p[1];
 	execvpe("", p, p);
 	return 0;
 }'
@@ -318,9 +318,18 @@ int main(void) {
 	setresuid(0, 0, 0);
 	return 0;
 }'
-check_func "setresuid" "$src" || {
-	printf 'OPENBSD  +=	setresuid.o\n' >>$CONFIG_MK
-}
+check_func "setresuid" "$src"
+
+#
+# Check for setresgid().
+#
+src='
+#include <unistd.h>
+int main(void) {
+	setresgid(0, 0, 0);
+	return 0;
+}'
+check_func "setresgid" "$src"
 
 #
 # Check for pledge().

@@ -24,6 +24,9 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
+#ifdef HAVE_READPASSPHRASE
+#include <readpassphrase.h>
+#endif
 #ifdef __linux__
 #include <limits.h>
 #endif
